@@ -1,0 +1,14 @@
+{
+	"MSN_WEATHER_DIRECTORY": "C:\\Users\\Paul\\AppData\\Local\\Microsoft\\Windows Sidebar\\Cache\\168522d5-1082-4df2-b2f6-9185c31f9472\\",
+	"WEATHER_LOCATION_CODE": "CAXX0343",
+	"MSN_WEATHER_FILE": "_wc-CAXX0343Fen-US_.xml",
+	"MSN_WEATHER_CACHE_FILE": "GlobalCacheCleanup.xml",
+	"API_KEY": "",
+	"LATITUDE": 45.2836,
+	"LONGITUDE": -75.7049,
+	"proxies": {
+		"http": "http://user:password@proxy:8080",
+		"https": "http://user:password@proxy:8080"
+	},
+	"verify": "proxy.crt"
+}

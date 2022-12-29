@@ -8,16 +8,39 @@ from xml.sax.saxutils import escape
 from datetime import datetime
 from datetime import timedelta
 from requests.auth import HTTPProxyAuth
-import weather_properties
+
+# Read the settings json file
+with open('settings.json') as f:
+    settings = json.load(f)
+    
+# Path to the Gadget's cache directory
+MSN_WEATHER_DIRECTORY = settings['MSN_WEATHER_DIRECTORY']
+# The weather file may vary depending on your location
+WEATHER_LOCATION_CODE = settings['WEATHER_LOCATION_CODE']
+MSN_WEATHER_FILE = settings['MSN_WEATHER_FILE']
+MSN_WEATHER_CACHE_FILE = settings['MSN_WEATHER_CACHE_FILE']
+
+# Enter your WeatherBit.io API key
+API_KEY = settings['API_KEY']
+# The forecast is based on coordinates
+LATITUDE = settings['LATITUDE']
+LONGITUDE = settings['LONGITUDE']
+
+# Enter any proxy URLs and credentials here
+proxies = settings['proxies']
+
+# Whether or not to verify certificates, 
+# or a certificate against which to verfiy
+verify = settings['verify']
 
 WEATHER_API_URL = 'https://api.weatherbit.io/v2.0/'
 CURRENT_WEATHER = 'current'
 DAILY_FORECAST = 'forecast/daily'
 
 params = { 
-    'key': weather_properties.API_KEY, 
-    'lat': weather_properties.LATITUDE,
-    'lon': weather_properties.LONGITUDE,
+    'key': API_KEY, 
+    'lat': LATITUDE,
+    'lon': LONGITUDE,
     'units': 'I',
     'include': 'alerts'
 }
@@ -71,7 +94,7 @@ def fahrenheit_to_celsius(fahrenheit):
 
 # Get the current weather
 currentWeatherResponse = requests.get(WEATHER_API_URL + CURRENT_WEATHER,
-                                      params=params, proxies=weather_properties.proxies, verify=weather_properties.verify)
+                                      params=params, proxies=proxies, verify=verify)
 currentWeather = currentWeatherResponse.json()['data'][0]
 alerts = currentWeatherResponse.json()['alerts']
 alertTitle = alerts[0]['title'] if len(alerts) > 0 else ''
@@ -80,7 +103,7 @@ alertTitle = alerts[0]['title'] if len(alerts) > 0 else ''
 
 # Get the forecast
 forecastResponse = requests.get(WEATHER_API_URL + DAILY_FORECAST,
-                                params=params, proxies=weather_properties.proxies, verify=weather_properties.verify)
+                                params=params, proxies=proxies, verify=verify)
 dailyforecast = forecastResponse.json()['data']
 
 # print('Tomorrow it will be a high of %dC with %s' % (fahrenheit_to_celsius(dailyforecast[1]['max_temp']), dailyforecast[1]['weather']['description']), flush=True)
@@ -109,7 +132,7 @@ timezoneoffset = datetime.now(pytz.timezone(currentWeather['timezone'])).utcoffs
 
 # Setup the weather element
 weatherAttribs = {
-    'weatherlocationcode': 'wc:' +weather_properties.WEATHER_LOCATION_CODE,
+    'weatherlocationcode': 'wc:' +WEATHER_LOCATION_CODE,
     'weatherlocationname': currentWeather['city_name'],
     'url': 'http://a.msn.com/54/en-US/ct%f,%f?ctsrc=Windows7' % (currentWeather['lat'], currentWeather['lon']),
     'imagerelativeurl': 'http://blob.weather.microsoft.com/static/weather4/en-us/',
@@ -178,5 +201,5 @@ Timestamp.text = str(datetime_to_mstimestamp(datetime.now() - timedelta(hours=2.
 # ET.dump(CacheCleanup)
 
 # Save the XML
-ET.ElementTree(CacheFile).write(weather_properties.MSN_WEATHER_DIRECTORY + weather_properties.MSN_WEATHER_FILE)
-ET.ElementTree(CacheCleanup).write(weather_properties.MSN_WEATHER_DIRECTORY + weather_properties.MSN_WEATHER_CACHE_FILE)
+ET.ElementTree(CacheFile).write(MSN_WEATHER_DIRECTORY + MSN_WEATHER_FILE)
+ET.ElementTree(CacheCleanup).write(MSN_WEATHER_DIRECTORY + MSN_WEATHER_CACHE_FILE)
